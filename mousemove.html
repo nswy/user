@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+			}
+			#box {
+				margin: 100px auto;
+				width: 640px;
+				height: 400px;
+				/*border: solid 1px orangered;*/
+				position: relative;
+				border-radius: 5px;
+				background-color: aquamarine;
+			}
+			.content {
+				width: 200px;
+				height: 120px;
+				border-radius: 10px;
+				/*border: solid 1px red;*/
+				
+				
+				font-size: 46px;
+				line-height: 120px;
+				text-align: center;
+				font-weight: bold;
+			}
+			.active1{
+				background: limegreen;
+				position: absolute;
+				left: 10px;
+				top: 10px;
+			}
+			.active2{
+				background: yellowgreen;
+				position: absolute;
+				left: 220px;
+				top: 10px;
+			}
+			.active3{
+				background: indianred;
+				position: absolute;
+				left: 430px;
+				top: 10px;
+			}
+			.active4{
+				background: dodgerblue;
+				position: absolute;
+				left: 10px;
+				top: 140px;
+			}
+			.active5{
+				background: blueviolet;
+				position: absolute;
+				left: 220px;
+				top: 140px;
+			}
+			.active6{
+				background: grey;
+				position: absolute;
+				left: 430px;
+				top: 140px;
+			}
+			.active7{
+				background: limegreen;
+				position: absolute;
+				left: 10px;
+				top: 270px;
+			}
+			.active8{
+				background: burlywood;
+				position: absolute;
+				left: 220px;
+				top: 270px;
+			}
+			.active9{
+				background: goldenrod;
+				position: absolute;
+				left: 430px;
+				top: 270px;
+				box-shadow: ;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="box">
+			<div class="active1 content">A</div>
+			<div class="active2 content">B</div>
+			<div class="active3 content">C</div>
+			<div class="active4 content">D</div>
+			<div class="active5 content">E</div>
+			<div class="active6 content">F</div>
+			<div class="active7 content">G</div>
+			<div class="active8 content">H</div>
+			<div class="active9 content">I</div>
+			
+		</div>
+		<script src="js/jquery-3.0.0.min.js"></script>
+		<script>
+		$(function() {
+			
+			console.log($("#box div").eq(0).offset().left);
+		   	var flag = 0;
+		   	var arr = [ ];
+		   	var that,clickNum,afterNum;
+		   	//将所有div的定位值left和top存在数组arr中
+			for (var i=0; i<$("#box div").length; i+=1) {
+			    	arr.push([parseInt($("#box div").eq(i).css("left")),parseInt($("#box div").eq(i).css("top"))]);
+		   	}
+			console.log(arr);
+			//判断鼠标在那个div
+			function pre(eX,eY){
+		    	let oDiv = $("#box div");
+				let index;	
+				for( let i=0;i<$("#box div").length; i+=1) {
+					//判断目前鼠标在那个模块的位置
+					//div的四个边框位置
+					let _left = oDiv.eq(i).offset().left-$("#box").offset().left;
+					let _right = oDiv.eq(i).offset().left+oDiv.eq(i).outerWidth()-$("#box").offset().left;
+					let _top = oDiv.eq(i).offset().top-$("#box").offset().top;
+					let _bottom = oDiv.eq(i).outerHeight()+oDiv.eq(i).offset().top-$("#box").offset().top;
+					
+					if ((eX > _left && eX < _right )  && (eY > _top && eY < _bottom) ){
+						index = i;
+					}
+				}
+				return index; //返回鼠标所在的div的序号
+		    }
+			
+			
+			//鼠标按下
+		    $("#box div").mousedown(function (event) {
+//		    	$("#box").on("mousemove");//清除上次移动
+
+		    	that = this;
+		    	let clickX = event.pageX - $("#box").offset().left;
+		    	let clickY = event.pageY - $("#box").offset().top;
+		    	//鼠标按下时 所在的是第几个div
+		    	clickNum = pre(clickX,clickY);
+		    	console.log(clickNum);
+		    	$(this).css({"box-shadow":"10px 10px 20px"});
+				//鼠标按下的标志
+				flag = 1;
+				
+				var _left = event.pageX + $("#box").offset().left - $(this).offset().left;
+				var _top = event.pageY + $("#box").offset().top - $(this).offset().top;
+			//鼠标移动
+			$("#box").mousemove(function (event) { 
+		    	event.preventDefault();//组织鼠标的默认拖动事件
+				
+//	    		console.log("event.pageX:"+(event.pageX- $("#box").offset().left)+ ",event.pageY:"+(event.pageY - $("#box").offset().top));
+//  			console.log(this);
+//				let eX = event.pageX - $("#box").offset().left;
+//				let eY = event.pageY - $("#box").offset().top;
+//				console.log(eX+"-"+eY);
+//				console.log(pre(eX,eY));
+				if(flag){
+					//按下鼠标时 div随鼠标移动
+					$(that).css({"left":(event.pageX- _left)+"px","top":(event.pageY - _top)+"px","z-index":"99"});
+				}
+	    		
+	    	});
+			
+			
+			
+			
+		});
+		
+		
+		    
+		    //鼠标松开
+	    	$("#box").mouseup(function (event) {
+	    		let upX = event.pageX - $("#box").offset().left;
+				let upY = event.pageY - $("#box").offset().top;
+				//松开鼠标时在第几个div
+	    		afterNum = pre(upX,upY);
+	    		console.log(afterNum);
+	    		flag = 0;
+	    		//交换两个div的定位
+	    		$("#box div").eq(clickNum).css({"left":arr[afterNum][0]+"px","top":arr[afterNum][1]+"px"});
+	    		$("#box div").eq(afterNum).css({"left":arr[clickNum][0]+"px","top":arr[clickNum][1]+"px"})
+	    		//松开鼠标时 清除鼠标移动事件
+	    		
+	    		$(that).css({"z-index":"0","box-shadow":"0 0"});
+	    		
+	    		
+	    	});
+		    
+		    
+		    
+	 	});
+			
+		</script>
+	</body>
+</html>
